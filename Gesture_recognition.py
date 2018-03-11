@@ -15,10 +15,10 @@ with g2.as_default():
     saver = tf.train.Saver()
 now = str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
 with tf.Session(graph=g2) as sess:
-    load(saver, sess, epoch=20, path='./model/')
+    load(saver, sess, epoch=20, path='../gesture_model_data/model/')
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(now+'.avi',fourcc, 10.0, (640,480))
+#    out = cv2.VideoWriter(now+'.avi',fourcc, 10.0, (640,480))
     cap = cv2.VideoCapture(0)
     number = 0
     while(True):
@@ -41,12 +41,16 @@ with tf.Session(graph=g2) as sess:
         
         # Display the resulting frame
         cv2.imshow('frame',frame)
-        out.write(frame)
+#        out.write(frame)
         key = int(cv2.waitKey(20))
+        if key == 48:
+            cv2.imwrite('./img.jpg', frame)
+            print(key)
         if key & 0xFF == ord('q'):
             break
     
     cap.release()
     cv2.destroyAllWindows()
+    
 
 del g2

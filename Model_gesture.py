@@ -106,8 +106,6 @@ def build_cnn(learning_rate):
     summary_loss = tf.summary.scalar('LOSS', cross_entropy_loss)
 
 
-    
-    
 def save(saver, sess, epoch, path='./model/'):
     if not os.path.isdir(path):
         os.makedirs(path)
@@ -185,25 +183,25 @@ if __name__=='__main__':
     learning_rate = 1e-4
     random_seed = 123
  
-#    g = tf.Graph()
-#    with g.as_default():
-#        tf.set_random_seed(random_seed)
-#        build_cnn(learning_rate)
-#        saver = tf.train.Saver()
-#        
-#    with tf.Session(graph=g) as sess:
-#        file_writer = tf.summary.FileWriter(logdir, tf.get_default_graph())
-#        train(sess, file_writer=file_writer,
-#              training_set=(X_train,y_train),
-#              validation_set=(X_valid, y_valid),
-#              initialize=True,
-#              random_seed=123, 
-#              epochs=20)
-#        save(saver,sess,epoch=20)
-#        preds = predict(sess, X_test, return_proba=False)
-#        print('KKR Test: {:.3f}%'.format((100*np.sum(preds==y_test)/len(y_test))))    
-#        file_writer.close()
-#    del g
+    g = tf.Graph()
+    with g.as_default():
+        tf.set_random_seed(random_seed)
+        build_cnn(learning_rate)
+        saver = tf.train.Saver()
+        
+    with tf.Session(graph=g) as sess:
+        file_writer = tf.summary.FileWriter(logdir, tf.get_default_graph())
+        train(sess, file_writer=file_writer,
+              training_set=(X_train,y_train),
+              validation_set=(X_valid, y_valid),
+              initialize=True,
+              random_seed=123, 
+              epochs=20)
+        save(saver,sess,epoch=20)
+        preds = predict(sess, X_valid, return_proba=False)
+        print('KKR Test: {:.3f}%'.format((100*np.sum(preds==y_valid)/len(y_valid))))    
+        file_writer.close()
+    del g
     
 
     saver = tf.train.import_meta_graph('../gestures/model/cnn-model.ckpt-20.meta')

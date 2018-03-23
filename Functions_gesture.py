@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+import pickle
 import os
 import cv2
 
@@ -41,5 +43,12 @@ def batch_generator(X,y, batch_size=50, shuffle=False, random_seed=None):
         
         
 if __name__=='__main__':
+    path='../gestures/train/'
+    X,y = load_gestures(path=path)
+    np.save('X_train', X)
+    np.save('y_train', y)
     
-    X,y = load_gestures()
+    X,y = load_gestures(path=path.replace('train', 'test'))
+    np.save('X_test', X)
+    np.save('y_test', y)
+    

@@ -1,9 +1,5 @@
-import tensorflow as tf
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import os
-import struct
 import cv2
 
 #%% load_mnist function
@@ -29,10 +25,7 @@ def load_gestures(path='./gestures/', shuffle=True, random_seed=None):
     return data_X, data_y
 
 
-        
-
 #%% batch_generator function
-
 
 def batch_generator(X,y, batch_size=50, shuffle=False, random_seed=None):
     idx = np.arange(y.shape[0])

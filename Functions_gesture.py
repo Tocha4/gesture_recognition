@@ -1,8 +1,26 @@
 import numpy as np
-import pandas as pd
-import pickle
 import os
 import cv2
+import matplotlib.pyplot as plt
+import seaborn as sns; sns.set()
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
+
+def plt_as_img(x,y):
+    fig = Figure(figsize=(6.4, 4.8))
+    canvas = FigureCanvas(fig)
+    ax = fig.gca()
+    
+    ps = ax.plot(x.T,y.T, '-')
+    ax.legend(iter(ps), [str(i) for i in range(6)], loc=1)
+    
+    ax.set_xlabel('time [seconds]')
+    ax.set_ylabel('accuracy of predicted digit')
+    width, height = np.array(fig.get_size_inches() * fig.get_dpi(), dtype=np.uint32)
+    canvas.draw()       # draw the canvas, cache the renderer
+    image = np.fromstring(canvas.tostring_rgb(), dtype='uint8').reshape(height, width, 3)
+    return image
 
 #%% load_mnist function
 def load_gestures(path='./gestures/', shuffle=True, random_seed=None):

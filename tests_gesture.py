@@ -1,65 +1,35 @@
 import numpy as np
-import tensorflow as tf
-from scipy.signal import convolve2d 
-import cv2
 import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize
-import skimage.measure as measure
-
-#%% 1D convolution
-n = 10
-m = 3
-
-x = np.random.rand(n)
-w = np.random.rand(m)
-
-y = np.convolve(x,w, mode='valid')
-print(y)
-
-#%% 2D convolution
-
-size = 5
-n2 = (10,10)
-m2 = (size, size)
-
-x2 = np.random.rand(*n2)
-ws = [[np.random.rand(*m2) for _ in range(5)] for _ in range(3)]
-y2 = convolve2d(x2, ws[0][0], mode='valid')
-
-#%% 2D Image convolution (RGB --> 3D)
-
-img = cv2.imread('./gestures/20180304175203_0.png', 0)
-
-#b,g,r = img[:,:,0],img[:,:,1],img[:,:,2]
-
-number = 1
-for i,c in enumerate([img]):
-    for j,w in enumerate(ws[i]):
-        
-        y_c = convolve2d(c,w, mode='valid')
-        y_c = measure.block_reduce(y_c, (3,3), np.max)
-        y_c = convolve2d(y_c,w, mode='valid')
-        y_c = measure.block_reduce(y_c, (3,3), np.max)
-        y_c = convolve2d(y_c,w, mode='valid')
-        y_c = measure.block_reduce(y_c, (2,2), np.max)
-        y_c = convolve2d(y_c,w, mode='valid')
-        y_c = measure.block_reduce(y_c, (2,2), np.max)
-
-        plt.subplot(3,5,number)
-        plt.imshow(y_c, norm=Normalize(vmin=0, vmax=600))
-        number += 1
-
-#%% 
+import seaborn as sns; sns.set()
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 
 
 
 
+def plt_as_img(x,y):
+    fig = Figure(figsize=(3.2, 2.4))
+    canvas = FigureCanvas(fig)
+    ax = fig.gca()
+    
+    ps = ax.plot(x.T,y.T, 'o')
+    ax.legend(iter(ps), [str(i) for i in range(6)], loc=1)
+    ax.axis('on')
+    width, height = np.array(fig.get_size_inches() * fig.get_dpi(), dtype=np.uint32)
+    canvas.draw()       # draw the canvas, cache the renderer
+    image = np.fromstring(canvas.tostring_rgb(), dtype='uint8').reshape(height, width, 3)
+    return image
 
 
 
 
 
+if __name__=='__main__':
+    x = np.array([np.linspace(i,50) for i in range(6)])
+    y = np.array([np.linspace(0,10) for _ in range(6)])
+    image = plt_as_img(x,y)
+    plt.imshow(image)
 
 
 

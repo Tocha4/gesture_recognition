@@ -1,8 +1,8 @@
 # gesture_recognition
 
+Click on the picture to get to the video
 
-
-[![cnn to predict numbers with gestures](https://github.com/Tocha4/gesture_recognition/blob/master/img.jpg)](https://youtu.be/BbtzxUtnSDU "cnn to predict numbers with gestures")
+[![cnn to predict numbers with gestures](https://github.com/Tocha4/gesture_recognition/blob/master/img.jpg "https://youtu.be/BbtzxUtnSDU cnn to predict numbers with gestures")](https://youtu.be/BbtzxUtnSDU "cnn to predict numbers with gestures")
 
 ### More information at:
 

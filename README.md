@@ -10,8 +10,5 @@ Mein Vorgehen lässt sich in drei Arbeitspakete unterteilen. __Zuerst__ habe ich
 2. Schritt: [Modell](https://github.com/Tocha4/gesture_recognition/blob/master/beschreibung/Modell.ipynb)
 3. Schritt: [Gesten_erkennen](https://github.com/Tocha4/gesture_recognition/blob/master/beschreibung/Gesten_erkennen.ipynb)
 
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/BbtzxUtnSDU/0.jpg)](http://www.youtube.com/watch?v=BbtzxUtnSDU)
 
-
-<div align="center">
-  <a href="https://youtu.be/2qVGL8cgIR0"><img src="https://youtu.be/2qVGL8cgIR0/0.jpg" alt="Gestenerkennung mit Aufnahme von Abfolgen"></a>
-</div>

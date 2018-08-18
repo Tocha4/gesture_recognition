@@ -3,10 +3,10 @@ import numpy as np
 import os
 import time
 from datetime import datetime
-from Functions_gesture import load_gestures, batch_generator
+from _Functions_gesture import load_gestures, batch_generator
 
 now = datetime.utcnow().strftime('%Y%m%d%H%M%s')
-root_logdir = 'logs'
+root_logdir = '../logs'
 logdir = '{}/run-{}/'.format(root_logdir, now)  
 
 #%% functions
@@ -134,11 +134,11 @@ def train(sess, training_set, file_writer=None, validation_set=None, initialize=
             feed = {'tf_x:0': batch_x,
                     'tf_y:0': batch_y,
                     'fc_keep_prob:0': dropout}
-            loss,_ = sess.run(['cross_entropy_loss:0', 'train_op'], feed_dict=feed)
+            loss,_,s_l = sess.run(['cross_entropy_loss:0', 'train_op','LOSS:0'], feed_dict=feed)
             avg_loss += loss
-            
+        file_writer.add_summary(s_l, epoch)    
         training_loss.append(avg_loss/(i+1))
-        print('Epoch %02d DWM Training: %7.3f' % (epoch, avg_loss), end=' ')
+        print('Epoch %02d Training LOSS: %7.3f' % (epoch, avg_loss), end=' ')
         
         if validation_set is not None:
             feed = {'tf_x:0': validation_set[0],
@@ -169,9 +169,9 @@ def predict(sess, X_test, return_proba=False):
 if __name__=='__main__':
     
 #%% Data for training
-    X_train, y_train = load_gestures(path='../gestures/train')
-    X_valid, y_valid = load_gestures(path='../gestures/test')
-    
+    X_train, y_train = load_gestures(path='../../gestures/train')
+    X_valid, y_valid = load_gestures(path='../../gestures/test')
+    X_valid, y_valid = X_valid[:64], y_valid[:64]
 #    mean_vals = np.mean(X_train, axis=0)
 #    std_val = np.std(X_train)
 #    
@@ -193,30 +193,29 @@ if __name__=='__main__':
         file_writer = tf.summary.FileWriter(logdir, tf.get_default_graph())
         train(sess, file_writer=file_writer,
               training_set=(X_train,y_train),
-              validation_set=(X_valid, y_valid),
+              validation_set=None, #####            (X_valid, y_valid)
               initialize=True,
               random_seed=123, 
-              epochs=20)
-        save(saver,sess,epoch=20)
-        preds = predict(sess, X_valid, return_proba=False)
-        print('KKR Test: {:.3f}%'.format((100*np.sum(preds==y_valid)/len(y_valid))))    
+              epochs=5)
+        save(saver,sess,epoch=5, path='../model_test/')
+#        preds = predict(sess, X_valid, return_proba=False)
+#        print('KKR Test: {:.3f}%'.format((100*np.sum(preds==y_valid)/len(y_valid))))    
         file_writer.close()
-    del g
     
 
-    saver = tf.train.import_meta_graph('../gestures/model/cnn-model.ckpt-20.meta')
-    with tf.Session(graph=tf.get_default_graph()) as sess:
-        load(saver, sess, epoch=20, path='../gestures/model/')
-        file_writer = tf.summary.FileWriter(logdir, tf.get_default_graph())
-        train(sess, file_writer=file_writer,
-              training_set=(X_train,y_train),
-              validation_set=(X_valid, y_valid),
-              initialize=False,
-              random_seed=123)
-        save(saver,sess,epoch=20)
-        preds = predict(sess, X_valid, return_proba=False)
-        print('KKR Test: {:.3f}%'.format((100*np.sum(preds==y_valid)/len(y_valid))))
-        file_writer.close()
+#    saver = tf.train.import_meta_graph('../../gestures/model/cnn-model.ckpt-20.meta')
+#    with tf.Session(graph=tf.get_default_graph()) as sess:
+#        load(saver, sess, epoch=20, path='../../gestures/model/')
+#        file_writer = tf.summary.FileWriter(logdir, tf.get_default_graph())
+#        train(sess, file_writer=file_writer,
+#              training_set=(X_train,y_train),
+#              validation_set=None,
+#              initialize=False,
+#              random_seed=123)
+#        save(saver,sess,epoch=20)
+#        preds = predict(sess, X_valid, return_proba=False)
+#        print('KKR Test: {:.3f}%'.format((100*np.sum(preds==y_valid)/len(y_valid))))
+#        file_writer.close()
 
 
 

@@ -4,9 +4,9 @@ import cv2
 from time import time
 from datetime import datetime
 from Model_gesture import load, predict
-from Functions_gesture import plt_as_img
+from _Functions_gesture import plt_as_img
     
-saver = tf.train.import_meta_graph('../gestures/model/cnn-model.ckpt-20.meta')
+saver = tf.train.import_meta_graph('../model_test/cnn-model.ckpt-20.meta')
 start = time()
 time_stamp = datetime.now().strftime('%Y%M%d%H%m%s')
 
@@ -14,7 +14,7 @@ predictions = np.zeros(shape=(6,100))
 time_line = np.zeros(shape=(6,100))
 
 with tf.Session(graph=tf.get_default_graph()) as sess:
-    load(saver, sess, epoch=20, path='../gestures/model/')
+    load(saver, sess, epoch=20, path='../model_test/')
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter(time_stamp+'.avi',fourcc, 5.0, (1280,480))

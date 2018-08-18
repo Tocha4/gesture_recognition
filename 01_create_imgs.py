@@ -3,27 +3,6 @@ import cv2
 import datetime
 
 
-#%%
-def create_real_imgs():
-    cap = cv2.VideoCapture(0)
-    
-    while True:
-        ret, frame = cap.read()
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        cv2.rectangle(frame,(40,80),(315,340),(0,255,0),3)
-        cv2.imshow('frame', frame)        
-        key = int(cv2.waitKey(1))
-        if key in [48,49,50,51,52,53]:
-            now = str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))            
-            cv2.imwrite('gestures_test/{}_{}.png'.format(now, key-48), gray[40:315,80:340])
-        elif key & 0xFF == ord('q'):
-            print(key)
-            break
-                
-    cap.release()
-    cv2.destroyAllWindows()
-
-#%%
 def create_real_images_fast():
     
     cap = cv2.VideoCapture(0)
@@ -44,9 +23,7 @@ def create_real_images_fast():
     
     cap.release()
     cv2.destroyAllWindows()
-    
 
-#%%
             
 if __name__=='__main__':
     

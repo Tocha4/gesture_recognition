@@ -20,7 +20,20 @@ class Modell(Layers):
         if not os.path.isdir(path):
             os.makedirs(path)
         print('Modell speichern in {}'.format(path))
-        saver.save(sess, os.path.join(path,'cnn-model.ckpt'), global_step=epoch)        
+        saver.save(sess, os.path.join(path,'cnn-model.ckpt'), global_step=epoch)  
+        
+    def load(self,sess, saver):
+        last = sorted(os.listdir(self.modeldir))[-1]
+        meta_last = [i for i in os.listdir(self.modeldir+last) if 'meta' in i][0]
+        epoch_last = int(meta_last.split('t-')[-1].split('.')[0])
+#        saver = tf.train.Saver()#tf.train.import_meta_graph(self.modeldir+last+'/{}'.format(meta_last))
+        print('Modell laden aus {}'.format(os.path.join(self.modeldir+last)))
+        saver.restore(sess, os.path.join(self.modeldir+last, 'cnn-model.ckpt-%d' % epoch_last))  
+        
+    def find_last(self):
+        last = sorted(os.listdir(self.modeldir))[-1]
+        meta_last = [i for i in os.listdir(self.modeldir+last) if 'meta' in i][0]
+        return os.path.join(self.modeldir+last, meta_last)    
         
     def train(self, sess, training_set, validation_set=None, initialize=True, epochs=20, shuffle=True, dropout=0.5, random_seed=None):
         
@@ -53,25 +66,23 @@ class Modell(Layers):
             summary.value.add(tag="AVG_LOSS", simple_value=avg_loss)
             file_writer.add_summary(summary, epoch)    
             print('Epoch %02d Training LOSS: %7.3f' % (epoch, avg_loss), end=' ')
-            #TODO
-            # validation part doesn't work yet
-            if validation_set is not None:
-                feed = {'tf_x:0': validation_set[0],
-                        'tf_y:0': validation_set[1],
+
+            if validation_set is not None:   
+                feed = {'tf_x:0': validation_set[0][:100],
+                        'tf_y:0': validation_set[1][:100],
                         'fc_keep_prob:0': 1.0}
                 valid_acc = sess.run('accuracy:0', feed_dict=feed)
-                print('KKR Validierung: %7.3f ' % valid_acc, end=' ')
+                print('Validierung ACCURACY: %7.3f ' % valid_acc, end=' ')
+                summary_valid_acc = tf.Summary()
+                summary_valid_acc.value.add(tag="VALID_ACCURACY", simple_value=valid_acc)
+                file_writer.add_summary(summary_valid_acc, epoch)   
                 end_epoch_time = (time.time()-start)/60
                 print('Time: {:.2f}min'.format(end_epoch_time))
+
+            else: 
+                end = time.time() - start
+                print('It took {:.2f}min'.format(end/60))
                 
-                s_a, s_l = sess.run(['ACCURACY:0','LOSS:0'],feed_dict=feed)
-                print(s_l)
-                file_writer.add_summary(s_a, epoch)
-                file_writer.add_summary(s_l, epoch)
-                
-            else: print()
-        end = time.time() - start
-        print('It took {:.2f}min'.format(end/60))
         file_writer.close()
         os.mkdir(self.modeldir+self.now)
         self.save(saver, sess, epochs, path=self.modeldir+self.now)
@@ -89,9 +100,7 @@ if __name__=='__main__':
 
 #%% Data for training
     X_train, y_train = load_gestures(path='../../gestures/train')
-    X_valid, y_valid = load_gestures(path='../../gestures/test')
-    X_valid, y_valid = X_valid[:64], y_valid[:64]
-    
+    X_valid, y_valid = load_gestures(path='../../gestures/test')    
     
     
 #%% CNN model
@@ -100,26 +109,17 @@ if __name__=='__main__':
     learning_rate = 1e-4
     
  
-    g = tf.Graph()
-    with g.as_default():
+      
+    graph = model.build_cnn(learning_rate)
         
-        model.build_cnn(learning_rate)
-        
-
-
-
-        
-    with tf.Session(graph=g) as sess:
-        
-        summary = model.train(sess, 
+    with tf.Session(graph=graph) as sess:        
+        model.train(sess, 
                     training_set=(X_train,y_train),
-                    validation_set=None, #####            (X_valid, y_valid)
-                    initialize=False,
+                    validation_set=(X_valid, y_valid), 
+                    initialize=True,
                     random_seed=123, 
-                    epochs=5)
-#        model.save(saver,sess,epoch=5, path='../model_test/')
-#        preds = predict(sess, X_valid, return_proba=False)
-#        print('KKR Test: {:.3f}%'.format((100*np.sum(preds==y_valid)/len(y_valid))))    
+                    epochs=20)
+
         
 
 
